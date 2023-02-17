@@ -4,7 +4,6 @@ namespace MyBoards.Entities
 {
     public class MyBoardsContext : DbContext
     {
-
         public MyBoardsContext(DbContextOptions<MyBoardsContext> options) : base(options) { }
         
         public DbSet<WorkItem> WorkItems { get; set; }
@@ -13,11 +12,9 @@ namespace MyBoards.Entities
         public DbSet<Tag> Tags { get; set; }
         public DbSet<User> Users { get; set; }
 
-        //protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        //{
-        //    optionsBuilder
-        //        .UseSqlServer("Server=(localdb)\\mssqllocaldb;Database=MyBoardsDb;Trusted_Connection=True;");
-        //}
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
 
+        }
     }
 }
