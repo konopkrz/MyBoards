@@ -1,6 +1,6 @@
 ﻿namespace MyBoards.Entities
 {
-    public class WorkItemcs
+    public class WorkItem
     {
         public string State { get; set; }
         public string Area { get; set; }

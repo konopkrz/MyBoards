@@ -1,3 +1,6 @@
+using Microsoft.EntityFrameworkCore;
+using MyBoards.Entities;
+
 namespace MyBoards
 {
     public class Program
@@ -12,6 +15,12 @@ namespace MyBoards
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
+
+            //P10 rejestracja kontekstu bazy
+            builder.Services.AddDbContext<MyBoardsContext>( 
+                option => option.UseSqlServer(builder.Configuration.GetConnectionString("MyBoardsConnectionString"))
+                );
+            //K10
 
             var app = builder.Build();
 
