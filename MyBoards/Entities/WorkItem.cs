@@ -6,7 +6,11 @@ namespace MyBoards.Entities
     {
 
         public int Id { get; set; }
-        public string State { get; set; }
+
+        public WorkItemState State { get; set; }
+
+        public int StateId { get; set; }
+
         public string Area { get; set; }
         public string IterationPath { get; set; }
 
@@ -32,6 +36,7 @@ namespace MyBoards.Entities
         public Guid AuthorId { get; set; }
 
         public List<Tag> Tags { get; set; }
+
 
     }
 }

@@ -12,6 +12,8 @@ namespace MyBoards.Entities
         public DbSet<Tag> Tags { get; set; }
         public DbSet<User> Users { get; set; }
 
+        public DbSet<WorkItemState> WorkItemsStates { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             //modelBuilder.Entity<WorkItem>()
@@ -20,8 +22,7 @@ namespace MyBoards.Entities
 
             modelBuilder.Entity<WorkItem>(eb =>
             {
-                //eb = entityBuilder, wi = workItem
-                eb.Property(wi => wi.State).IsRequired();
+
                 eb.Property(wi => wi.Area).HasColumnType("varchar(200)");
                 eb.Property(wi => wi.IterationPath).HasColumnName("Iteration_Path");
                 eb.Property(wi => wi.Effort).HasColumnType("decimal(5,2)");
@@ -53,6 +54,10 @@ namespace MyBoards.Entities
                             wit.Property(x => x.PublicationDate).HasDefaultValueSql("getutcdate()");
                         }
                     );
+
+                eb.HasOne(wi => wi.State)
+                    .WithMany(s => s.WorkItems)
+                    .HasForeignKey(wi => wi.StateId);
                     
             });
 
@@ -61,6 +66,12 @@ namespace MyBoards.Entities
                 // ustawianie domyślnej wartości daty po stonie SQL'a
                 eb.Property(ci => ci.CreatedDate).HasDefaultValueSql("getutcdate()");
                 eb.Property(ci => ci.UpdatedDate).ValueGeneratedOnUpdate();
+            });
+
+            modelBuilder.Entity<WorkItemState>(eb => 
+            {
+                eb.Property(s => s.Value).IsRequired();
+                eb.Property(s => s.Value).HasMaxLength(50);
             });
 
             modelBuilder.Entity<User>()
