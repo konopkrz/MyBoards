@@ -31,5 +31,7 @@ namespace MyBoards.Entities
 
         public Guid AuthorId { get; set; }
 
+        public List<Tag> Tags { get; set; } = new List<Tag>();
+
     }
 }
