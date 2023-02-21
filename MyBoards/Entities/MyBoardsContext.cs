@@ -14,17 +14,15 @@ namespace MyBoards.Entities
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<WorkItem>()
-                .Property(x => x.State)
-                .IsRequired();
-
-            modelBuilder.Entity<WorkItem>()
-                .Property(x => x.Area)
-                .HasColumnType("varchar(200)");
+            //modelBuilder.Entity<WorkItem>()
+            //    .Property(x => x.State)
+            //    .IsRequired();
 
             modelBuilder.Entity<WorkItem>(eb =>
             {
                 //eb = entityBuilder, wi = workItem
+                eb.Property(wi => wi.State).IsRequired();
+                eb.Property(wi => wi.Area).HasColumnType("varchar(200)");
                 eb.Property(wi => wi.IterationPath).HasColumnName("Iteration_Path");
                 eb.Property(wi => wi.Effort).HasColumnType("decimal(5,2)");
                 eb.Property(wi => wi.EndDate).HasPrecision(3);
