@@ -7,7 +7,7 @@ namespace MyBoards.Entities
         public MyBoardsContext(DbContextOptions<MyBoardsContext> options) : base(options) { }
         
         public DbSet<WorkItem> WorkItems { get; set; }
-        public DbSet<Adress> Adresses { get; set; }
+        public DbSet<Address> Adresses { get; set; }
         public DbSet<Comment> Comments { get; set; }
         public DbSet<Tag> Tags { get; set; }
         public DbSet<User> Users { get; set; }
@@ -37,6 +37,11 @@ namespace MyBoards.Entities
                 eb.Property(ci => ci.CreatedDate).HasDefaultValueSql("getutcdate()");
                 eb.Property(ci => ci.UpdatedDate).ValueGeneratedOnUpdate();
             });
+
+            modelBuilder.Entity<User>()
+                .HasOne(u => u.Address)
+                .WithOne(a => a.User)
+                .HasForeignKey<Address>(a => a.UserId);
         }
     }
 }
