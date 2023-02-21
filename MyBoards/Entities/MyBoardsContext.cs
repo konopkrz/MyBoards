@@ -39,7 +39,21 @@ namespace MyBoards.Entities
                     .HasForeignKey(wi => wi.AuthorId);
 
                 eb.HasMany(wi => wi.Tags)
-                    .WithMany(t => t.WorkItems);
+                    .WithMany(t => t.WorkItems)
+                    .UsingEntity<WorkItemTag>(
+                        w => w.HasOne(wit => wit.Tag)
+                        .WithMany()
+                        .HasForeignKey(wit => wit.TagId),
+                        w => w.HasOne(wit => wit.WorkItem)
+                        .WithMany()
+                        .HasForeignKey(wit => wit.WorkItemId),
+                        wit =>
+                        {
+                            wit.HasKey(x => new { x.TagId, x.WorkItemId });
+                            wit.Property(x => x.PublicationDate).HasDefaultValueSql("getutcdate()");
+                        }
+                    );
+                    
             });
 
             modelBuilder.Entity<Comment>(eb =>
