@@ -83,7 +83,7 @@ namespace MyBoards.Entities
             modelBuilder.Entity<WorkItemState>(eb => 
             {
                 eb.Property(s => s.Value).IsRequired();
-                eb.Property(s => s.Value).HasMaxLength(50);
+                eb.Property(s => s.Value).HasMaxLength(60);
             });
 
             modelBuilder.Entity<User>()
