@@ -74,6 +74,23 @@ namespace MyBoards
                 dbContext.SaveChanges();
             }
 
+            var tags = dbContext.Tags.ToList();
+
+            if(!tags.Any())
+            {
+                var tagList = new List<Tag> {
+                    new Tag { Value = "Web"},
+                    new Tag { Value = "UI"},
+                    new Tag { Value = "Desktop"},
+                    new Tag { Value = "API"},
+                    new Tag { Value = "Service"}
+                };
+
+                dbContext.Tags.AddRange(tagList);
+
+                dbContext.SaveChanges();
+            };
+
             app.Run();
         }
     }
