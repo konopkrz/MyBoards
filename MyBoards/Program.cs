@@ -43,6 +43,36 @@ namespace MyBoards
                 dbContext.Database.Migrate();
             }
 
+            var users = dbContext.Users.ToList();
+
+            if(!users.Any())
+            {
+                var user1 = new User() {
+                    FullName = "John Smith",
+                    Email = "jsmith@gmail.com",
+                    Address = new Address()
+                    {
+                        Street = "Long st. 19",
+                        City = "Chelsea",
+                        PostalCode = "02150"
+                    }
+                };
+                var user2 = new User()
+                {
+                    FullName = "Paul Newman",
+                    Email = "paulnewman@gmail.com",
+                    Address = new Address()
+                    {
+                        Street = "Victory st. 4",
+                        City = "Derry",
+                        PostalCode = "04550"
+                    }
+                };
+
+                dbContext.Users.AddRange(user1, user2);
+
+                dbContext.SaveChanges();
+            }
 
             app.Run();
         }
