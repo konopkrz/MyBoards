@@ -76,14 +76,19 @@ namespace MyBoards.Entities
             modelBuilder.Entity<Comment>(eb =>
             {
                 // ustawianie domyślnej wartości daty po stonie SQL'a
-                eb.Property(ci => ci.CreatedDate).HasDefaultValueSql("getutcdate()");
-                eb.Property(ci => ci.UpdatedDate).ValueGeneratedOnUpdate();
+                eb.Property(c => c.CreatedDate).HasDefaultValueSql("getutcdate()");
+                eb.Property(c => c.UpdatedDate).ValueGeneratedOnUpdate();
+                eb.HasOne(c => c.Author)
+                   .WithMany(u => u.Comments)
+                   .HasForeignKey(c => c.AuthorId)
+                   .OnDelete(DeleteBehavior.NoAction);
+
             });
 
             modelBuilder.Entity<WorkItemState>(eb => 
             {
                 eb.Property(s => s.Value).IsRequired();
-                eb.Property(s => s.Value).HasMaxLength(50);
+                eb.Property(s => s.Value).HasMaxLength(60);
             });
 
             modelBuilder.Entity<User>()

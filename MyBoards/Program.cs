@@ -33,6 +33,17 @@ namespace MyBoards
 
             app.UseAuthorization();
 
+            using var scope = app.Services.CreateScope();
+            var dbContext = scope.ServiceProvider.GetService<MyBoardsContext>();
+
+            var pendingMigration = dbContext.Database.GetPendingMigrations();
+            //czy nie jest null'em i czy ma jak¹kolwiek wartoœæ
+            if (pendingMigration != null && pendingMigration.Any())
+            {
+                dbContext.Database.Migrate();
+            }
+
+
             app.Run();
         }
     }
