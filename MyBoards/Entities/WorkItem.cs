@@ -31,7 +31,7 @@ namespace MyBoards.Entities
         public string Area { get; set; }
         public string IterationPath { get; set; }
 
-        public int Prority { get; set; }
+        public int Priority { get; set; }
 
         public List<Comment> Comments { get; set; } = new List<Comment>();
 

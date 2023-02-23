@@ -41,7 +41,7 @@ namespace MyBoards.Entities
 
                 eb.Property(wi => wi.Area).HasColumnType("varchar(200)");
                 eb.Property(wi => wi.IterationPath).HasColumnName("Iteration_Path");
-                eb.Property(wi => wi.Prority).HasDefaultValue(1);
+                eb.Property(wi => wi.Priority).HasDefaultValue(1);
 
                 eb.HasMany(wi => wi.Comments)
                    .WithOne(c => c.WorkItem)
