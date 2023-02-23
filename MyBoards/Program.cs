@@ -128,21 +128,33 @@ namespace MyBoards
                 //    .OrderBy(e => e.Priority)
                 //    .ToListAsync();
 
-                var authors = await db
+                //var authors = await db
+                //    .Comments
+                //    .GroupBy(c => c.AuthorId)
+                //    .Select(g => new { authorId = g.Key, count = g.Count() })
+                //    .ToListAsync();
+
+                //var topAuthor = authors
+                //    .FirstOrDefault(a => a.count == authors.Max(ac => ac.count));
+
+                //var selectedAuthor = await db
+                //    .Users
+                //    .Where(u => u.Id == topAuthor.authorId)
+                //    .FirstOrDefaultAsync();
+
+                var comment = db
                     .Comments
-                    .GroupBy(c => c.AuthorId)
-                    .Select(g => new { authorId = g.Key, count = g.Count() })
-                    .ToListAsync();
+                    .Select(c => new
+                    {
+                        CommentAuthor = c.Author.FullName,
+                        WorkItemAuthor = c.WorkItem.Author.FullName,
+                        CommentMess = c.Message,
+                        Date = c.CreatedDate
 
-                var topAuthor = authors
-                    .FirstOrDefault(a => a.count == authors.Max(ac => ac.count));
+                    })
+                    .ToList();
 
-                var selectedAuthor = await db
-                    .Users
-                    .Where(u => u.Id == topAuthor.authorId)
-                    .FirstOrDefaultAsync();
-
-                return new { selectedAuthor, count = topAuthor.count  };
+                return comment;
 
             });
 
