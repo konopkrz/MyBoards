@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using MyBoards.Entities;
+using Newtonsoft.Json;
 
 namespace MyBoards
 {
@@ -15,6 +16,18 @@ namespace MyBoards
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
+
+            //P28
+            // builder.Services.AddControllers();
+
+            //// usuwanie zapêtleñ: sposób pierwszy
+            //builder.Services.AddControllers().AddJsonOptions(option =>
+            //    option.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles);
+
+            //// usuwanie zapêtleñ: sposób drugi
+            builder.Services.AddControllers().AddNewtonsoftJson(
+                option => option.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore);
+            //K28
 
             //P10 rejestracja kontekstu bazy
             builder.Services.AddDbContext<MyBoardsContext>( 
@@ -90,6 +103,34 @@ namespace MyBoards
 
                 dbContext.SaveChanges();
             };
+
+            app.MapGet("data", async (MyBoardsContext db) =>
+            {
+
+                //var newComments = await db
+                //    .Comments
+                //    .Where(c => c.CreatedDate > new DateTime(2022, 07, 23))
+                //    .ToListAsync();
+
+                //return newComments;
+
+                //var top5Comments = await db
+                //    .Comments
+                //    .OrderByDescending(c => c.CreatedDate)
+                //    .Take(5)
+                //    .ToListAsync();
+
+                //return top5Comments;
+
+                var statesCount = await db
+                    .WorkItems
+                    .GroupBy(wi => wi.StateId)
+                    .Select(g => new { stateId = g.Key, count = g.Count()})
+                    .ToListAsync();
+
+                return statesCount;
+
+            });
 
             app.Run();
         }
