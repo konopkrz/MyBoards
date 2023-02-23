@@ -122,13 +122,27 @@ namespace MyBoards
 
                 //return top5Comments;
 
-                var statesCount = await db
-                    .WorkItems
-                    .GroupBy(wi => wi.StateId)
-                    .Select(g => new { stateId = g.Key, count = g.Count()})
+                //var epicList = await db
+                //    .Epics
+                //    .Where(e => e.State.Value == "On hold")
+                //    .OrderBy(e => e.Priority)
+                //    .ToListAsync();
+
+                var authors = await db
+                    .Comments
+                    .GroupBy(c => c.AuthorId)
+                    .Select(g => new { authorId = g.Key, count = g.Count() })
                     .ToListAsync();
 
-                return statesCount;
+                var topAuthor = authors
+                    .FirstOrDefault(a => a.count == authors.Max(ac => ac.count));
+
+                var selectedAuthor = await db
+                    .Users
+                    .Where(u => u.Id == topAuthor.authorId)
+                    .FirstOrDefaultAsync();
+
+                return new { selectedAuthor, count = topAuthor.count  };
 
             });
 
