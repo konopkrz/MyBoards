@@ -68,7 +68,7 @@ namespace MyBoards.Entities
                     );
 
                 eb.HasOne(wi => wi.State)
-                    .WithMany()
+                    .WithMany(s => s.WorkItems)
                     .HasForeignKey(wi => wi.StateId);
 
             });

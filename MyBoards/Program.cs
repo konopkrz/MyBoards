@@ -1,6 +1,7 @@
+using Microsoft.AspNetCore.Http.Json;
 using Microsoft.EntityFrameworkCore;
 using MyBoards.Entities;
-
+using System.Text.Json.Serialization;
 
 namespace MyBoards
 {
@@ -17,17 +18,13 @@ namespace MyBoards
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
 
-            ////P28
-            //// builder.Services.AddControllers();
+            //P28
+            builder.Services.Configure<JsonOptions>(options =>
+            {
+                options.SerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
+            });
+            //K28
 
-            ////// usuwanie zapêtleñ: sposób pierwszy
-            ////builder.Services.AddControllers().AddJsonOptions(option =>
-            ////    option.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles);
-
-            ////// usuwanie zapêtleñ: sposób drugi
-            //builder.Services.AddControllers().AddNewtonsoftJson(
-            //    option => option.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore);
-            ////K28
 
             //P10 rejestracja kontekstu bazy
             builder.Services.AddDbContext<MyBoardsContext>( 
@@ -165,11 +162,11 @@ namespace MyBoards
 
             });
 
-            app.MapPost("update", async (MyBoardsContext db) =>
+            app.MapPut("update", async (MyBoardsContext db) =>
             {
                 Epic epic = await db.Epics.FirstAsync(e => e.Id == 1);
 
-                var RejectedStateId = await db.WorkItemsStates.FirstAsync(wis => wis.Value == "Rejected");
+                var RejectedStateId = await db.WorkItemsStates.FirstAsync(wis => wis.Value == "To do");
 
                 epic.State = RejectedStateId;
 
@@ -179,7 +176,31 @@ namespace MyBoards
 
             });
 
-                app.Run();
+
+            app.MapPost("create", async (MyBoardsContext db) =>
+            {
+
+                var user = new User()
+                {
+                    FullName = "MyAdmin3",
+                    Email = "admin@gmail.com",
+                    Address = new Address()
+                    {
+                        Country = "USA",
+                        City = "ChelseaMa",
+                        Street = "23 Front st",
+                        PostalCode = "02150"
+                    }
+                };
+
+                await db.Users.AddAsync(user);
+                //await db.SaveChangesAsync();
+
+                return user;
+
+            });
+
+            app.Run();
         }
     }
 }
