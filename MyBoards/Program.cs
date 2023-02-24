@@ -27,7 +27,7 @@ namespace MyBoards
 
 
             //P10 rejestracja kontekstu bazy
-            builder.Services.AddDbContext<MyBoardsContext>( 
+            builder.Services.AddDbContext<MyBoardsContext>(
                 option => option.UseSqlServer(builder.Configuration.GetConnectionString("MyBoardsConnectionString"))
                 );
             //K10
@@ -55,7 +55,7 @@ namespace MyBoards
 
             var users = dbContext.Users.ToList();
 
-            if(!users.Any())
+            if (!users.Any())
             {
                 var user1 = new User() {
                     FullName = "John Smith",
@@ -86,7 +86,7 @@ namespace MyBoards
 
             var tags = dbContext.Tags.ToList();
 
-            if(!tags.Any())
+            if (!tags.Any())
             {
                 var tagList = new List<Tag> {
                     new Tag { Value = "Web"},
@@ -162,7 +162,18 @@ namespace MyBoards
 
             });
 
-            app.MapPut("update", async (MyBoardsContext db) =>
+            app.MapGet("dataV2", async (MyBoardsContext db) =>
+            {
+                var user = await db.Users
+                            .Include(u => u.Comments)
+                            .Include(u => u.Address)
+                            .Include(u => u.WorkItems).ThenInclude(wi => wi.Comments)
+                            .FirstOrDefaultAsync(u => u.Id == Guid.Parse("0AC6DA2A-CF70-48A0-CC21-08DA10AB0E61"));
+                return  user;
+
+            });
+
+           app.MapPut("update", async (MyBoardsContext db) =>
             {
                 Epic epic = await db.Epics.FirstAsync(e => e.Id == 1);
 
