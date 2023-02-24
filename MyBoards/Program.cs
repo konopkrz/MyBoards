@@ -213,8 +213,6 @@ namespace MyBoards
 
             app.MapDelete("delete", async (MyBoardsContext db, Guid id) =>
             {
-
-
                 var user = await db.Users
                                     .Include(u => u.Comments)
                                     .FirstOrDefaultAsync(u => u.Id == id);
