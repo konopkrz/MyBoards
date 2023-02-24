@@ -211,6 +211,19 @@ namespace MyBoards
 
             });
 
+            app.MapDelete("delete", async (MyBoardsContext db, Guid id) =>
+            {
+                //var comments = await db.Comments.Where(c => c.AuthorId == id).ToListAsync();
+                //db.Comments.RemoveRange(comments);
+
+                var user = await db.Users.FirstOrDefaultAsync(u => u.Id == id);
+                db.Users.RemoveRange(user);
+
+                await db.SaveChangesAsync();
+
+            })
+            .Accepts<int>("application/json");
+
             app.Run();
         }
     }

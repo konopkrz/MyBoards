@@ -19,6 +19,8 @@ namespace MyBoards.Entities
 
         public DbSet<WorkItemState> WorkItemsStates { get; set; }
 
+        public DbSet<WorkItemTag> WorkItemTag { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Epic>()
