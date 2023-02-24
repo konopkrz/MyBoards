@@ -83,7 +83,8 @@ namespace MyBoards.Entities
                 eb.HasOne(c => c.Author)
                    .WithMany(u => u.Comments)
                    .HasForeignKey(c => c.AuthorId)
-                   .OnDelete(DeleteBehavior.NoAction);
+                   //.OnDelete(DeleteBehavior.NoAction);
+                   .OnDelete(DeleteBehavior.ClientCascade);
 
             });
 
