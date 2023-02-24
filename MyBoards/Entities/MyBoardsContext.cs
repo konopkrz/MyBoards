@@ -68,9 +68,9 @@ namespace MyBoards.Entities
                     );
 
                 eb.HasOne(wi => wi.State)
-                    .WithMany(s => s.WorkItems)
+                    .WithMany()
                     .HasForeignKey(wi => wi.StateId);
-                    
+
             });
 
             modelBuilder.Entity<Comment>(eb =>

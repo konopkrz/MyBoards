@@ -1,6 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using MyBoards.Entities;
-using Newtonsoft.Json;
+
 
 namespace MyBoards
 {
@@ -17,17 +17,17 @@ namespace MyBoards
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
 
-            //P28
-            // builder.Services.AddControllers();
+            ////P28
+            //// builder.Services.AddControllers();
 
-            //// usuwanie zapêtleñ: sposób pierwszy
-            //builder.Services.AddControllers().AddJsonOptions(option =>
-            //    option.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles);
+            ////// usuwanie zapêtleñ: sposób pierwszy
+            ////builder.Services.AddControllers().AddJsonOptions(option =>
+            ////    option.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles);
 
-            //// usuwanie zapêtleñ: sposób drugi
-            builder.Services.AddControllers().AddNewtonsoftJson(
-                option => option.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore);
-            //K28
+            ////// usuwanie zapêtleñ: sposób drugi
+            //builder.Services.AddControllers().AddNewtonsoftJson(
+            //    option => option.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore);
+            ////K28
 
             //P10 rejestracja kontekstu bazy
             builder.Services.AddDbContext<MyBoardsContext>( 
@@ -142,23 +142,44 @@ namespace MyBoards
                 //    .Where(u => u.Id == topAuthor.authorId)
                 //    .FirstOrDefaultAsync();
 
-                var comment = db
-                    .Comments
-                    .Select(c => new
-                    {
-                        CommentAuthor = c.Author.FullName,
-                        WorkItemAuthor = c.WorkItem.Author.FullName,
-                        CommentMess = c.Message,
-                        Date = c.CreatedDate
+                var epics = db
+                    .Epics
+                    .Select(ep => ep.Area)
+                    //.Where(e => e.Id > 1)
+                    .OrderByDescending(e => e)
+                    .GroupBy(e => e)
 
-                    })
+
+                    //.Select(c => new
+                    //{
+                    //    CommentAuthor = c.Author.FullName,
+                    //    WorkItemAuthor = c.WorkItem.Author.FullName,
+                    //    CommentMess = c.Message,
+                    //    Date = c.CreatedDate
+
+
+                    //})
                     .ToList();
 
-                return comment;
+                return epics;
 
             });
 
-            app.Run();
+            app.MapPost("update", async (MyBoardsContext db) =>
+            {
+                Epic epic = await db.Epics.FirstAsync(e => e.Id == 1);
+
+                var RejectedStateId = await db.WorkItemsStates.FirstAsync(wis => wis.Value == "Rejected");
+
+                epic.State = RejectedStateId;
+
+                await db.SaveChangesAsync();
+
+                return epic;
+
+            });
+
+                app.Run();
         }
     }
 }
