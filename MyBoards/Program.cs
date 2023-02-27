@@ -103,62 +103,20 @@ namespace MyBoards
 
             app.MapGet("data", async (MyBoardsContext db) =>
             {
-
-                //var newComments = await db
-                //    .Comments
-                //    .Where(c => c.CreatedDate > new DateTime(2022, 07, 23))
-                //    .ToListAsync();
-
-                //return newComments;
-
-                //var top5Comments = await db
-                //    .Comments
-                //    .OrderByDescending(c => c.CreatedDate)
-                //    .Take(5)
-                //    .ToListAsync();
-
-                //return top5Comments;
-
-                //var epicList = await db
-                //    .Epics
-                //    .Where(e => e.State.Value == "On hold")
-                //    .OrderBy(e => e.Priority)
-                //    .ToListAsync();
-
-                //var authors = await db
-                //    .Comments
-                //    .GroupBy(c => c.AuthorId)
-                //    .Select(g => new { authorId = g.Key, count = g.Count() })
-                //    .ToListAsync();
-
-                //var topAuthor = authors
-                //    .FirstOrDefault(a => a.count == authors.Max(ac => ac.count));
-
-                //var selectedAuthor = await db
-                //    .Users
-                //    .Where(u => u.Id == topAuthor.authorId)
-                //    .FirstOrDefaultAsync();
-
-                var epics = db
-                    .Epics
-                    .Select(ep => ep.Area)
-                    //.Where(e => e.Id > 1)
-                    .OrderByDescending(e => e)
-                    .GroupBy(e => e)
-
-
-                    //.Select(c => new
-                    //{
-                    //    CommentAuthor = c.Author.FullName,
-                    //    WorkItemAuthor = c.WorkItem.Author.FullName,
-                    //    CommentMess = c.Message,
-                    //    Date = c.CreatedDate
-
-
-                    //})
+                var minWorkItemsCount = 85;
+                var states = db.WorkItemsStates
+                    .FromSqlInterpolated($@"SELECT wis.Id, wis.Value
+                                FROM WorkItems AS wi, WorkItemsStates AS wis
+                                WHERE wi.StateId = wis.Id
+                                GROUP BY wis.Id, wis.Value
+                                HAVING Count(*) > {minWorkItemsCount}")
                     .ToList();
 
-                return epics;
+                db.Database.ExecuteSqlRaw(@"UPDATE Comments
+                                SET UpdatedDate = GETDATE()
+                                 WHERE AuthorId = '0AD08268-24F5-47CA-CBE8-08DA10AB0E61'");
+
+                return states;
 
             });
 
