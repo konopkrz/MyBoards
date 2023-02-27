@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using MyBoards.Entities;
 
@@ -11,9 +12,11 @@ using MyBoards.Entities;
 namespace MyBoards.Migrations
 {
     [DbContext(typeof(MyBoardsContext))]
-    partial class MyBoardsContextModelSnapshot : ModelSnapshot
+    [Migration("20230223111558_DbSetAddresses")]
+    partial class DbSetAddresses
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -48,7 +51,7 @@ namespace MyBoards.Migrations
                     b.HasIndex("UserId")
                         .IsUnique();
 
-                    b.ToTable("Addresses", (string)null);
+                    b.ToTable("Addresses");
                 });
 
             modelBuilder.Entity("MyBoards.Entities.Comment", b =>
@@ -83,7 +86,7 @@ namespace MyBoards.Migrations
 
                     b.HasIndex("WorkItemId");
 
-                    b.ToTable("Comments", (string)null);
+                    b.ToTable("Comments");
                 });
 
             modelBuilder.Entity("MyBoards.Entities.Tag", b =>
@@ -99,7 +102,7 @@ namespace MyBoards.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Tags", (string)null);
+                    b.ToTable("Tags");
                 });
 
             modelBuilder.Entity("MyBoards.Entities.User", b =>
@@ -116,7 +119,7 @@ namespace MyBoards.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Users", (string)null);
+                    b.ToTable("Users");
                 });
 
             modelBuilder.Entity("MyBoards.Entities.WorkItem", b =>
@@ -155,7 +158,7 @@ namespace MyBoards.Migrations
 
                     b.HasIndex("StateId");
 
-                    b.ToTable("WorkItems", (string)null);
+                    b.ToTable("WorkItems");
 
                     b.HasDiscriminator<string>("Discriminator").HasValue("WorkItem");
 
@@ -177,7 +180,7 @@ namespace MyBoards.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("WorkItemsStates", (string)null);
+                    b.ToTable("WorkItemsStates");
 
                     b.HasData(
                         new
@@ -214,7 +217,7 @@ namespace MyBoards.Migrations
 
                     b.HasIndex("WorkItemId");
 
-                    b.ToTable("WorkItemTag", (string)null);
+                    b.ToTable("WorkItemTag");
                 });
 
             modelBuilder.Entity("MyBoards.Entities.Epic", b =>

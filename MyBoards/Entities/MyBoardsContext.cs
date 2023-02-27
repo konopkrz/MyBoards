@@ -12,12 +12,14 @@ namespace MyBoards.Entities
         public DbSet<Issue> Issues { get; set; }
         public DbSet<Task> Tasks { get; set; }
 
-        public DbSet<Address> Adresses { get; set; }
+        public DbSet<Address> Addresses { get; set; }
         public DbSet<Comment> Comments { get; set; }
         public DbSet<Tag> Tags { get; set; }
         public DbSet<User> Users { get; set; }
 
         public DbSet<WorkItemState> WorkItemsStates { get; set; }
+
+        public DbSet<WorkItemTag> WorkItemTag { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -41,7 +43,7 @@ namespace MyBoards.Entities
 
                 eb.Property(wi => wi.Area).HasColumnType("varchar(200)");
                 eb.Property(wi => wi.IterationPath).HasColumnName("Iteration_Path");
-                eb.Property(wi => wi.Prority).HasDefaultValue(1);
+                eb.Property(wi => wi.Priority).HasDefaultValue(1);
 
                 eb.HasMany(wi => wi.Comments)
                    .WithOne(c => c.WorkItem)
@@ -70,7 +72,7 @@ namespace MyBoards.Entities
                 eb.HasOne(wi => wi.State)
                     .WithMany(s => s.WorkItems)
                     .HasForeignKey(wi => wi.StateId);
-                    
+
             });
 
             modelBuilder.Entity<Comment>(eb =>
@@ -81,7 +83,8 @@ namespace MyBoards.Entities
                 eb.HasOne(c => c.Author)
                    .WithMany(u => u.Comments)
                    .HasForeignKey(c => c.AuthorId)
-                   .OnDelete(DeleteBehavior.NoAction);
+                   //.OnDelete(DeleteBehavior.NoAction);
+                   .OnDelete(DeleteBehavior.ClientCascade);
 
             });
 

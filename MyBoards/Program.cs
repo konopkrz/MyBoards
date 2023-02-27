@@ -1,5 +1,7 @@
+using Microsoft.AspNetCore.Http.Json;
 using Microsoft.EntityFrameworkCore;
 using MyBoards.Entities;
+using System.Text.Json.Serialization;
 
 namespace MyBoards
 {
@@ -16,8 +18,16 @@ namespace MyBoards
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
 
+            //P28
+            builder.Services.Configure<JsonOptions>(options =>
+            {
+                options.SerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
+            });
+            //K28
+
+
             //P10 rejestracja kontekstu bazy
-            builder.Services.AddDbContext<MyBoardsContext>( 
+            builder.Services.AddDbContext<MyBoardsContext>(
                 option => option.UseSqlServer(builder.Configuration.GetConnectionString("MyBoardsConnectionString"))
                 );
             //K10
@@ -45,7 +55,7 @@ namespace MyBoards
 
             var users = dbContext.Users.ToList();
 
-            if(!users.Any())
+            if (!users.Any())
             {
                 var user1 = new User() {
                     FullName = "John Smith",
@@ -76,7 +86,7 @@ namespace MyBoards
 
             var tags = dbContext.Tags.ToList();
 
-            if(!tags.Any())
+            if (!tags.Any())
             {
                 var tagList = new List<Tag> {
                     new Tag { Value = "Web"},
@@ -90,6 +100,129 @@ namespace MyBoards
 
                 dbContext.SaveChanges();
             };
+
+            app.MapGet("data", async (MyBoardsContext db) =>
+            {
+
+                //var newComments = await db
+                //    .Comments
+                //    .Where(c => c.CreatedDate > new DateTime(2022, 07, 23))
+                //    .ToListAsync();
+
+                //return newComments;
+
+                //var top5Comments = await db
+                //    .Comments
+                //    .OrderByDescending(c => c.CreatedDate)
+                //    .Take(5)
+                //    .ToListAsync();
+
+                //return top5Comments;
+
+                //var epicList = await db
+                //    .Epics
+                //    .Where(e => e.State.Value == "On hold")
+                //    .OrderBy(e => e.Priority)
+                //    .ToListAsync();
+
+                //var authors = await db
+                //    .Comments
+                //    .GroupBy(c => c.AuthorId)
+                //    .Select(g => new { authorId = g.Key, count = g.Count() })
+                //    .ToListAsync();
+
+                //var topAuthor = authors
+                //    .FirstOrDefault(a => a.count == authors.Max(ac => ac.count));
+
+                //var selectedAuthor = await db
+                //    .Users
+                //    .Where(u => u.Id == topAuthor.authorId)
+                //    .FirstOrDefaultAsync();
+
+                var epics = db
+                    .Epics
+                    .Select(ep => ep.Area)
+                    //.Where(e => e.Id > 1)
+                    .OrderByDescending(e => e)
+                    .GroupBy(e => e)
+
+
+                    //.Select(c => new
+                    //{
+                    //    CommentAuthor = c.Author.FullName,
+                    //    WorkItemAuthor = c.WorkItem.Author.FullName,
+                    //    CommentMess = c.Message,
+                    //    Date = c.CreatedDate
+
+
+                    //})
+                    .ToList();
+
+                return epics;
+
+            });
+
+            app.MapGet("dataV2", async (MyBoardsContext db) =>
+            {
+                var user = await db.Users
+                            .Include(u => u.Comments)
+                            .Include(u => u.Address)
+                            .Include(u => u.WorkItems).ThenInclude(wi => wi.Comments)
+                            .FirstOrDefaultAsync(u => u.Id == Guid.Parse("0AC6DA2A-CF70-48A0-CC21-08DA10AB0E61"));
+                return  user;
+
+            });
+
+           app.MapPut("update", async (MyBoardsContext db) =>
+            {
+                Epic epic = await db.Epics.FirstAsync(e => e.Id == 1);
+
+                var RejectedStateId = await db.WorkItemsStates.FirstAsync(wis => wis.Value == "To do");
+
+                epic.State = RejectedStateId;
+
+                await db.SaveChangesAsync();
+
+                return epic;
+
+            });
+
+
+            app.MapPost("create", async (MyBoardsContext db) =>
+            {
+
+                var user = new User()
+                {
+                    FullName = "MyAdmin3",
+                    Email = "admin@gmail.com",
+                    Address = new Address()
+                    {
+                        Country = "USA",
+                        City = "ChelseaMa",
+                        Street = "23 Front st",
+                        PostalCode = "02150"
+                    }
+                };
+
+                await db.Users.AddAsync(user);
+                //await db.SaveChangesAsync();
+
+                return user;
+
+            });
+
+            app.MapDelete("delete", async (MyBoardsContext db, Guid id) =>
+            {
+                var user = await db.Users
+                                    .Include(u => u.Comments)
+                                    .FirstOrDefaultAsync(u => u.Id == id);
+
+                db.Users.RemoveRange(user);
+
+                await db.SaveChangesAsync();
+
+            })
+            .Accepts<Guid>("application/json");
 
             app.Run();
         }
