@@ -103,20 +103,26 @@ namespace MyBoards
 
             app.MapGet("data", async (MyBoardsContext db) =>
             {
-                var minWorkItemsCount = 85;
-                var states = db.WorkItemsStates
-                    .FromSqlInterpolated($@"SELECT wis.Id, wis.Value
-                                FROM WorkItems AS wi, WorkItemsStates AS wis
-                                WHERE wi.StateId = wis.Id
-                                GROUP BY wis.Id, wis.Value
-                                HAVING Count(*) > {minWorkItemsCount}")
-                    .ToList();
+                //var minWorkItemsCount = 85;
+                //var states = db.WorkItemsStates
+                //    .FromSqlInterpolated($@"SELECT wis.Id, wis.Value
+                //                FROM WorkItems AS wi, WorkItemsStates AS wis
+                //                WHERE wi.StateId = wis.Id
+                //                GROUP BY wis.Id, wis.Value
+                //                HAVING Count(*) > {minWorkItemsCount}")
+                //    .Select(u => u.Value)
+                //    .ToList();
 
-                db.Database.ExecuteSqlRaw(@"UPDATE Comments
-                                SET UpdatedDate = GETDATE()
-                                 WHERE AuthorId = '0AD08268-24F5-47CA-CBE8-08DA10AB0E61'");
+                //db.Database.ExecuteSqlRaw(@"UPDATE Comments
+                //                SET UpdatedDate = GETDATE()
+                //                 WHERE AuthorId = '0AD08268-24F5-47CA-CBE8-08DA10AB0E61'");
 
-                return states;
+                //return states;
+
+
+                var topAuthors = db.ViewTopAuthors.ToList();
+
+                return topAuthors;
 
             });
 

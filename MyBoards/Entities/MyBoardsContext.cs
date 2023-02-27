@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using MyBoards.Entities.ViewModels;
 
 namespace MyBoards.Entities
 {
@@ -20,6 +21,8 @@ namespace MyBoards.Entities
         public DbSet<WorkItemState> WorkItemsStates { get; set; }
 
         public DbSet<WorkItemTag> WorkItemTag { get; set; }
+
+        public DbSet<TopAuthor> ViewTopAuthors { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -104,6 +107,13 @@ namespace MyBoards.Entities
                          new WorkItemState() { Id = 2, Value = "Doing" },
                          new WorkItemState() { Id = 3, Value = "Done" }
                         );
+
+            modelBuilder.Entity<TopAuthor>( eb =>
+            {
+                eb.ToView("View_TopAuthors");
+                eb.HasNoKey();
+            });
+
         }
     }
 }
