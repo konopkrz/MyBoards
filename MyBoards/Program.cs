@@ -28,7 +28,9 @@ namespace MyBoards
 
             //P10 rejestracja kontekstu bazy
             builder.Services.AddDbContext<MyBoardsContext>(
-                option => option.UseSqlServer(builder.Configuration.GetConnectionString("MyBoardsConnectionString"))
+                option => option
+                .UseLazyLoadingProxies()
+                .UseSqlServer(builder.Configuration.GetConnectionString("MyBoardsConnectionString"))
                 );
             //K10
 
@@ -103,29 +105,35 @@ namespace MyBoards
 
             app.MapGet("data", async (MyBoardsContext db) =>
             {
-                //var minWorkItemsCount = 85;
-                //var states = db.WorkItemsStates
-                //    .FromSqlInterpolated($@"SELECT wis.Id, wis.Value
-                //                FROM WorkItems AS wi, WorkItemsStates AS wis
-                //                WHERE wi.StateId = wis.Id
-                //                GROUP BY wis.Id, wis.Value
-                //                HAVING Count(*) > {minWorkItemsCount}")
-                //    .Select(u => u.Value)
-                //    .ToList();
+            //var minWorkItemsCount = 85;
+            //var states = db.WorkItemsStates
+            //    .FromSqlInterpolated($@"SELECT wis.Id, wis.Value
+            //                FROM WorkItems AS wi, WorkItemsStates AS wis
+            //                WHERE wi.StateId = wis.Id
+            //                GROUP BY wis.Id, wis.Value
+            //                HAVING Count(*) > {minWorkItemsCount}")
+            //    .Select(u => u.Value)
+            //    .ToList();
 
-                //db.Database.ExecuteSqlRaw(@"UPDATE Comments
-                //                SET UpdatedDate = GETDATE()
-                //                 WHERE AuthorId = '0AD08268-24F5-47CA-CBE8-08DA10AB0E61'");
+            //db.Database.ExecuteSqlRaw(@"UPDATE Comments
+            //                SET UpdatedDate = GETDATE()
+            //                 WHERE AuthorId = '0AD08268-24F5-47CA-CBE8-08DA10AB0E61'");
 
-                //return states;
+            //return states;
 
-                var addresses = db.Addresses
-                            .Where(a => a.Coordinate.Longitude == 12.3323M)
-                            .ToList();
+            var withAddress = true;
 
-                var topAuthors = db.ViewTopAuthors.ToList();
+            var user = db.Users
+                        .FirstOrDefault(u => u.Id == Guid.Parse("78CF834E-7724-4995-CBC4-08DA10AB0E61"));
 
-                return topAuthors;
+                if(withAddress)
+                {
+                    var result = new { FullName = user.FullName, Address = $"{user.Address.Street} {user.Address.City}" };
+                    return result;
+                }
+
+                return new { FullName = user.FullName, Address = "-" };
+
 
             });
 
