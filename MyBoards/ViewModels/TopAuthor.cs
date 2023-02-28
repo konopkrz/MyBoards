@@ -1,4 +1,4 @@
-﻿namespace MyBoards.Entities.ViewModels
+﻿namespace MyBoards.ViewModels
 {
     public class TopAuthor
     {
