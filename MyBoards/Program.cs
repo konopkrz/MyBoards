@@ -119,6 +119,9 @@ namespace MyBoards
 
                 //return states;
 
+                var addresses = db.Addresses
+                            .Where(a => a.Coordinate.Longitude == 12.3323M)
+                            .ToList();
 
                 var topAuthors = db.ViewTopAuthors.ToList();
 
