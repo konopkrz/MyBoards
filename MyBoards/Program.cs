@@ -1,6 +1,9 @@
 using Microsoft.AspNetCore.Http.Json;
 using Microsoft.EntityFrameworkCore;
+using MyBoards.Dto;
 using MyBoards.Entities;
+using Swashbuckle.AspNetCore.SwaggerGen;
+using System.Linq.Expressions;
 using System.Text.Json.Serialization;
 
 namespace MyBoards
@@ -102,6 +105,57 @@ namespace MyBoards
 
                 dbContext.SaveChanges();
             };
+
+            app.MapGet("pagination", async (MyBoardsContext db) =>
+            {
+                //user input
+                var filter = "mail";
+                string sortBy = "FullName"; // "FullName", "Email" null
+                bool sortByDescending = false;
+                int pageNumber = 4;
+                int pageSize = 5;
+                //
+
+                //1. filtrowanie
+                //2. Sortowanie
+                //3. Paginacja
+
+
+                //1. filtrowanie
+                var query = db.Users
+                    .Where(u => filter == null || (u.FullName.ToLower().Contains(filter.ToLower())
+                                                    || u.Email.ToLower().Contains(filter.ToLower())));
+                var totalItems = query.Count();
+
+                //2. Sortowanie    
+                if (sortBy != null)
+                {
+                    
+                    var columnsSelector = new Dictionary<string, Expression<Func<User, object>>>
+                    {
+                        { nameof(User.Email), user => user.Email },
+                        { nameof(User.FullName), user => user.FullName} 
+                    };
+
+                    //Expression<Func<User, object>> sortByExpression = columnsSelector[sortBy];
+                    var sortByExpression = columnsSelector[sortBy];
+                    query = sortByDescending 
+                        ? query.OrderByDescending(sortByExpression)
+                        : query.OrderBy(sortByExpression);
+
+                }
+
+                //3. Paginacja
+                var result = query.Skip((pageNumber-1)*pageSize)
+                        .Take(pageSize)
+                        .ToList();
+
+                var pagedResult = new PagedResult<User>(result, totalItems, pageNumber, pageSize);
+
+                return pagedResult;
+
+
+            }); 
 
             app.MapGet("data", async (MyBoardsContext db) =>
             {
