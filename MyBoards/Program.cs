@@ -29,7 +29,7 @@ namespace MyBoards
             //P10 rejestracja kontekstu bazy
             builder.Services.AddDbContext<MyBoardsContext>(
                 option => option
-                .UseLazyLoadingProxies()
+                //.UseLazyLoadingProxies()
                 .UseSqlServer(builder.Configuration.GetConnectionString("MyBoardsConnectionString"))
                 );
             //K10
