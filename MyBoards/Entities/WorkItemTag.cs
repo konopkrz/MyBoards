@@ -2,10 +2,10 @@
 {
     public class WorkItemTag
     {
-        public virtual WorkItem WorkItem { get; set; }
+        public WorkItem WorkItem { get; set; }
         public int WorkItemId { get; set; }
 
-        public virtual Tag Tag { get; set; }
+        public Tag Tag { get; set; }
 
         public int TagId { get; set; }
 

@@ -29,7 +29,7 @@ namespace MyBoards
             //P10 rejestracja kontekstu bazy
             builder.Services.AddDbContext<MyBoardsContext>(
                 option => option
-                //.UseLazyLoadingProxies()
+         //       .UseLazyLoadingProxies()
                 .UseSqlServer(builder.Configuration.GetConnectionString("MyBoardsConnectionString"))
                 );
             //K10
@@ -121,18 +121,11 @@ namespace MyBoards
 
             //return states;
 
-            var withAddress = true;
-
             var user = db.Users
                         .FirstOrDefault(u => u.Id == Guid.Parse("78CF834E-7724-4995-CBC4-08DA10AB0E61"));
 
-                if(withAddress)
-                {
-                    var result = new { FullName = user.FullName, Address = $"{user.Address.Street} {user.Address.City}" };
-                    return result;
-                }
 
-                return new { FullName = user.FullName, Address = "-" };
+                return user;
 
 
             });
