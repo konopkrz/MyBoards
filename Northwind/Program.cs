@@ -1,3 +1,4 @@
+using LinqToDB.EntityFrameworkCore;
 using Microsoft.AspNetCore.Http.Json;
 using Microsoft.EntityFrameworkCore;
 using Northwind.Entities;
@@ -45,6 +46,18 @@ namespace Northwind
             app.UseHttpsRedirection();
 
             app.UseAuthorization();
+
+            app.MapPut("update", async (NorthwindContext db) =>
+            {
+                var empolyees = db.Employees
+                    .Where(e => e.HireDate > new DateTime(2021, 6, 1));
+
+                await LinqToDB.LinqExtensions.UpdateAsync(empolyees.ToLinqToDB(), x => new Employee
+                {
+                    Notes = "New employee"
+                });
+            
+            });
 
             app.MapGet("data", async (NorthwindContext db) =>
             {
