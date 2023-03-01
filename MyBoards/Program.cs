@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Http.Json;
 using Microsoft.EntityFrameworkCore;
 using MyBoards.Dto;
 using MyBoards.Entities;
+using MyBoards.ViewModels;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using System.Linq.Expressions;
 using System.Text.Json.Serialization;
@@ -159,27 +160,32 @@ namespace MyBoards
 
             app.MapGet("data", async (MyBoardsContext db) =>
             {
-            //var minWorkItemsCount = 85;
-            //var states = db.WorkItemsStates
-            //    .FromSqlInterpolated($@"SELECT wis.Id, wis.Value
-            //                FROM WorkItems AS wi, WorkItemsStates AS wis
-            //                WHERE wi.StateId = wis.Id
-            //                GROUP BY wis.Id, wis.Value
-            //                HAVING Count(*) > {minWorkItemsCount}")
-            //    .Select(u => u.Value)
-            //    .ToList();
+                //var minWorkItemsCount = 85;
+                //var states = db.WorkItemsStates
+                //    .FromSqlInterpolated($@"SELECT wis.Id, wis.Value
+                //                FROM WorkItems AS wi, WorkItemsStates AS wis
+                //                WHERE wi.StateId = wis.Id
+                //                GROUP BY wis.Id, wis.Value
+                //                HAVING Count(*) > {minWorkItemsCount}")
+                //    .Select(u => u.Value)
+                //    .ToList();
 
-            //db.Database.ExecuteSqlRaw(@"UPDATE Comments
-            //                SET UpdatedDate = GETDATE()
-            //                 WHERE AuthorId = '0AD08268-24F5-47CA-CBE8-08DA10AB0E61'");
+                //db.Database.ExecuteSqlRaw(@"UPDATE Comments
+                //                SET UpdatedDate = GETDATE()
+                //                 WHERE AuthorId = '0AD08268-24F5-47CA-CBE8-08DA10AB0E61'");
 
-            //return states;
+                //return states;
 
-            var user = db.Users
-                        .FirstOrDefault(u => u.Id == Guid.Parse("78CF834E-7724-4995-CBC4-08DA10AB0E61"));
+                var user = await db.Users
+                            .Include(u => u.Address)
+                            .Include(u => u.Comments)
+                            .Where(u => u.Address.Country == "Finland")
+                            .SelectMany(u => u.Comments.DefaultIfEmpty(), (user, comment) =>
+                                new MessageAlbanianUser { FullName = user.FullName, Email = user.Email,
+                                                          Country = user.Address.Country, Message = comment.Message })
+                            .ToListAsync();
 
-
-                return user;
+               return user;
 
 
             });

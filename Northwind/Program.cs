@@ -1,6 +1,8 @@
+using LinqToDB.EntityFrameworkCore;
 using Microsoft.AspNetCore.Http.Json;
 using Microsoft.EntityFrameworkCore;
 using Northwind.Entities;
+using System.Linq.Expressions;
 using System.Text.Json.Serialization;
 
 namespace Northwind
@@ -45,6 +47,18 @@ namespace Northwind
 
             app.UseAuthorization();
 
+            app.MapPut("update", async (NorthwindContext db) =>
+            {
+                var empolyees = db.Employees
+                    .Where(e => e.HireDate > new DateTime(2021, 6, 1));
+
+                await LinqToDB.LinqExtensions.UpdateAsync(empolyees.ToLinqToDB(), x => new Employee
+                {
+                    Notes = "New employee"
+                });
+            
+            });
+
             app.MapGet("data", async (NorthwindContext db) =>
             {
                 var sampleData = await db.Products
@@ -57,7 +71,48 @@ namespace Northwind
                 return sampleData;
             });
 
+            app.MapGet("getOrderDetails", async (NorthwindContext db) =>
+            {
+                Order order = await GetOrder(10248, db, o => o.OrderDetails);
+
+                return order;
+            });
+
+            app.MapGet("getOrderWithShipper", async (NorthwindContext db) =>
+            {
+                Order order = await GetOrder(10248, db, o => o.OrderDetails, o => o.ShipViaNavigation);
+
+                return order;
+            });
+
+            app.MapGet("getOrderWithCustomer", async (NorthwindContext db) =>
+            {
+                Order order = await GetOrder(10248, db, o => o.Customer);
+
+                return order;
+            });
+
             app.Run();
         }
+
+        private static async Task<Order> GetOrder(int orderId, NorthwindContext db, params Expression<Func<Order, object>>[] includes)
+        {
+            var baseQuery = db.Orders.AsQueryable();
+
+            if(includes.Any())
+            {
+                foreach(var include in includes)
+                {
+                    baseQuery= baseQuery.Include(include);
+                }
+            }
+
+            var order = await baseQuery.FirstAsync(o => o.OrderId == orderId);
+
+            return order;
+        }
+
+
     }
+
 }

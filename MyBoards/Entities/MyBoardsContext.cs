@@ -23,6 +23,7 @@ namespace MyBoards.Entities
         public DbSet<WorkItemTag> WorkItemTag { get; set; }
 
         public DbSet<TopAuthor> ViewTopAuthors { get; set; }
+        public DbSet<MessageAlbanianUser> ViewMessageAlbanianUsers { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
