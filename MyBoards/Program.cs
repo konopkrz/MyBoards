@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Http.Json;
 using Microsoft.EntityFrameworkCore;
 using MyBoards.Dto;
 using MyBoards.Entities;
+using MyBoards.ViewModels;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using System.Linq.Expressions;
 using System.Text.Json.Serialization;
@@ -175,7 +176,13 @@ namespace MyBoards
 
                 //return states;
 
-                var albanianUser = await db.ViewMessageAlbanianUsers
+                var albanianUser = await db.Users
+                            .Include(u => u.Address)
+                            .Include(u => u.Comments)
+                            .Where(u => u.Address.Country == "Finland")
+                            .SelectMany(u => u.Comments.DefaultIfEmpty(), (user, comment) =>
+                                new MessageAlbanianUser { FullName = user.FullName, Email = user.Email,
+                                                          Country = user.Address.Country, Message = comment.Message })
                             .ToListAsync();
 
                return albanianUser;
