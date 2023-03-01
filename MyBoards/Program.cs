@@ -176,7 +176,7 @@ namespace MyBoards
 
                 //return states;
 
-                var albanianUser = await db.Users
+                var user = await db.Users
                             .Include(u => u.Address)
                             .Include(u => u.Comments)
                             .Where(u => u.Address.Country == "Finland")
@@ -185,7 +185,7 @@ namespace MyBoards
                                                           Country = user.Address.Country, Message = comment.Message })
                             .ToListAsync();
 
-               return albanianUser;
+               return user;
 
 
             });
