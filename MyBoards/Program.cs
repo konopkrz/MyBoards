@@ -1,6 +1,9 @@
 using Microsoft.AspNetCore.Http.Json;
 using Microsoft.EntityFrameworkCore;
+using MyBoards.Dto;
 using MyBoards.Entities;
+using Swashbuckle.AspNetCore.SwaggerGen;
+using System.Linq.Expressions;
 using System.Text.Json.Serialization;
 
 namespace MyBoards
@@ -28,7 +31,9 @@ namespace MyBoards
 
             //P10 rejestracja kontekstu bazy
             builder.Services.AddDbContext<MyBoardsContext>(
-                option => option.UseSqlServer(builder.Configuration.GetConnectionString("MyBoardsConnectionString"))
+                option => option
+         //       .UseLazyLoadingProxies()
+                .UseSqlServer(builder.Configuration.GetConnectionString("MyBoardsConnectionString"))
                 );
             //K10
 
@@ -101,64 +106,81 @@ namespace MyBoards
                 dbContext.SaveChanges();
             };
 
+            app.MapGet("pagination", async (MyBoardsContext db) =>
+            {
+                //user input
+                var filter = "mail";
+                string sortBy = "FullName"; // "FullName", "Email" null
+                bool sortByDescending = false;
+                int pageNumber = 4;
+                int pageSize = 5;
+                //
+
+                //1. filtrowanie
+                //2. Sortowanie
+                //3. Paginacja
+
+
+                //1. filtrowanie
+                var query = db.Users
+                    .Where(u => filter == null || (u.FullName.ToLower().Contains(filter.ToLower())
+                                                    || u.Email.ToLower().Contains(filter.ToLower())));
+                var totalItems = query.Count();
+
+                //2. Sortowanie    
+                if (sortBy != null)
+                {
+                    
+                    var columnsSelector = new Dictionary<string, Expression<Func<User, object>>>
+                    {
+                        { nameof(User.Email), user => user.Email },
+                        { nameof(User.FullName), user => user.FullName} 
+                    };
+
+                    //Expression<Func<User, object>> sortByExpression = columnsSelector[sortBy];
+                    var sortByExpression = columnsSelector[sortBy];
+                    query = sortByDescending 
+                        ? query.OrderByDescending(sortByExpression)
+                        : query.OrderBy(sortByExpression);
+
+                }
+
+                //3. Paginacja
+                var result = query.Skip((pageNumber-1)*pageSize)
+                        .Take(pageSize)
+                        .ToList();
+
+                var pagedResult = new PagedResult<User>(result, totalItems, pageNumber, pageSize);
+
+                return pagedResult;
+
+
+            }); 
+
             app.MapGet("data", async (MyBoardsContext db) =>
             {
+            //var minWorkItemsCount = 85;
+            //var states = db.WorkItemsStates
+            //    .FromSqlInterpolated($@"SELECT wis.Id, wis.Value
+            //                FROM WorkItems AS wi, WorkItemsStates AS wis
+            //                WHERE wi.StateId = wis.Id
+            //                GROUP BY wis.Id, wis.Value
+            //                HAVING Count(*) > {minWorkItemsCount}")
+            //    .Select(u => u.Value)
+            //    .ToList();
 
-                //var newComments = await db
-                //    .Comments
-                //    .Where(c => c.CreatedDate > new DateTime(2022, 07, 23))
-                //    .ToListAsync();
+            //db.Database.ExecuteSqlRaw(@"UPDATE Comments
+            //                SET UpdatedDate = GETDATE()
+            //                 WHERE AuthorId = '0AD08268-24F5-47CA-CBE8-08DA10AB0E61'");
 
-                //return newComments;
+            //return states;
 
-                //var top5Comments = await db
-                //    .Comments
-                //    .OrderByDescending(c => c.CreatedDate)
-                //    .Take(5)
-                //    .ToListAsync();
-
-                //return top5Comments;
-
-                //var epicList = await db
-                //    .Epics
-                //    .Where(e => e.State.Value == "On hold")
-                //    .OrderBy(e => e.Priority)
-                //    .ToListAsync();
-
-                //var authors = await db
-                //    .Comments
-                //    .GroupBy(c => c.AuthorId)
-                //    .Select(g => new { authorId = g.Key, count = g.Count() })
-                //    .ToListAsync();
-
-                //var topAuthor = authors
-                //    .FirstOrDefault(a => a.count == authors.Max(ac => ac.count));
-
-                //var selectedAuthor = await db
-                //    .Users
-                //    .Where(u => u.Id == topAuthor.authorId)
-                //    .FirstOrDefaultAsync();
-
-                var epics = db
-                    .Epics
-                    .Select(ep => ep.Area)
-                    //.Where(e => e.Id > 1)
-                    .OrderByDescending(e => e)
-                    .GroupBy(e => e)
+            var user = db.Users
+                        .FirstOrDefault(u => u.Id == Guid.Parse("78CF834E-7724-4995-CBC4-08DA10AB0E61"));
 
 
-                    //.Select(c => new
-                    //{
-                    //    CommentAuthor = c.Author.FullName,
-                    //    WorkItemAuthor = c.WorkItem.Author.FullName,
-                    //    CommentMess = c.Message,
-                    //    Date = c.CreatedDate
+                return user;
 
-
-                    //})
-                    .ToList();
-
-                return epics;
 
             });
 
