@@ -59,6 +59,8 @@ namespace MyBoards
                 dbContext.Database.Migrate();
             }
 
+            //DataGenerator.Seed(dbContext);
+
             var users = dbContext.Users.ToList();
 
             if (!users.Any())
