@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 
 namespace MyBoards.Benchmark
 {
+    [Config(typeof(AntiVirusFriendlyConfig))]
     [MemoryDiagnoser]
     public class TrackingBenchmark
     {
